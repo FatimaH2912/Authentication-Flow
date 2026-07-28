@@ -1,5 +1,8 @@
+const swaggerUi = require("swagger-ui-express");
+const openapi = require("./openapi.json");
 require("dotenv").config();
 
+const authMiddleware = require("../middleware/middleware");
 const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 
@@ -78,31 +81,33 @@ app.get("/public/info", (req, res) => {
 });
 
 // Protected endpoint (token not verified yet)
-app.get("/protected/profile", async (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({
-      error: "Access token required"
-    });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  const { data, error } = await supabase.auth.getUser(token);
-
-  if (error) {
-    return res.status(401).json({
-      error: "Invalid or expired token"
-    });
-  }
-
+app.get("/protected/profile", authMiddleware, (req, res) => {
   return res.status(200).json({
-    id: data.user.id,
-    email: data.user.email,
-    created_at: data.user.created_at
+    id: req.user.id,
+    email: req.user.email,
+    created_at: req.user.created_at,
   });
 });
+
+app.get("/protected/dashboard", authMiddleware, (req, res) => {
+  return res.status(200).json({
+    message: `Welcome ${req.user.email}`,
+  });
+});
+
+app.post("/auth/logout", authMiddleware, async (req, res) => {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    return res.status(400).json({
+      error: error.message,
+    });
+  }
+
+  return res.sendStatus(204);
+});
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapi));
 
 app.listen(PORT, () => {
   console.log(`Server running and connected to Supabase on port ${PORT}`);
