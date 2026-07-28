@@ -5,8 +5,11 @@ const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 
+// Middleware to parse JSON request bodies
 app.use(express.json());
 
+
+// Create a Supabase client using the environment variables
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
