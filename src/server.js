@@ -70,6 +70,31 @@ app.post("/auth/login", async (req, res) => {
   });
 });
 
+// Public endpoint
+app.get("/public/info", (req, res) => {
+  return res.status(200).json({
+    message: "Welcome stranger! This info is public."
+  });
+});
+
+// Protected endpoint (token not verified yet)
+app.get("/protected/profile", (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (
+    !authHeader ||
+    !authHeader.startsWith("Bearer ")
+  ) {
+    return res.status(401).json({
+      error: "Access token required"
+    });
+  }
+
+  return res.status(200).json({
+    message: "Token received. Verification comes in Stage 3."
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running and connected to Supabase on port ${PORT}`);
 });
