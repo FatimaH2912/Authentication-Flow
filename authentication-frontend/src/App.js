@@ -1,9 +1,19 @@
+import { Routes, Route } from "react-router-dom";
+import Signup from "./pages/Signup";
+
 function App() {
   return (
-    <div>
-      <h1>Authentication Flow</h1>
-      <p>React frontend is running successfully.</p>
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={<Signup />}
+      />
+
+      <Route
+        path="/signup"
+        element={<Signup />}
+      />
+    </Routes>
   );
 }
 
