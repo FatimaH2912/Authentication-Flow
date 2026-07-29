@@ -1,3 +1,4 @@
+const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const openapi = require("./openapi.json");
 require("dotenv").config();
@@ -7,6 +8,7 @@ const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
+app.use(cors());
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
